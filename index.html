@@ -4,103 +4,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post Generator Admin</title>
+    <title>Post Generator Admin | Industry Insights</title>
     <style>
+         :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --card: #ffffff;
+        }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
         }
         
         .card {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: var(--card);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
         }
         
         h2 {
-            color: #333;
+            margin-top: 0;
+            color: #1e293b;
+            font-size: 1.5rem;
             text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 0.5rem;
         }
         
         input,
         textarea {
             width: 100%;
             padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            margin-bottom: 1.25rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
             box-sizing: border-box;
+        }
+        
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
         }
         
         button {
             width: 100%;
-            padding: 12px;
-            background-color: #007bff;
+            padding: 14px;
+            background-color: var(--primary);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: opacity 0.2s;
         }
         
-        button:hover {
-            background-color: #0056b3;
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        #status {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .success {
+            color: #059669;
+        }
+        
+        .error {
+            color: #dc2626;
         }
     </style>
 </head>
 
 <body>
+
     <div class="card">
-        <h2>🚀 Create Tech Post</h2>
-        <input type="text" id="title" placeholder="Enter Topic (e.g. Docker Basics)" required>
-        <textarea id="description" rows="3" placeholder="Summary (Optional)"></textarea>
-        <button onclick="sendToN8N()">Generate Post</button>
+        <h2>🚀 Post Generator</h2>
+
+        <label for="title">Topic (Required)</label>
+        <input type="text" id="title" placeholder="e.g. US-Iran Crisis" required>
+
+        <label for="description">Summary / Details (Optional)</label>
+        <textarea id="description" rows="4" placeholder="Mention key points you want in the post..."></textarea>
+
+        <label for="link">Source Link (Optional)</label>
+        <input type="url" id="link" placeholder="https://example.com/news">
+
+        <button id="submitBtn" onclick="sendToN8N()">Generate & Post Now</button>
+        <div id="status"></div>
     </div>
 
     <script>
         async function sendToN8N() {
             const title = document.getElementById('title').value;
             const description = document.getElementById('description').value;
+            const link = document.getElementById('link').value;
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('status');
 
             if (!title) {
-                alert("Topic එකක් දාන්න මචං!");
+                alert("මචං, Topic එකක් නැතුව පෝස්ට් එකක් හදන්න බෑනේ!");
                 return;
             }
 
+            // URL එක පරීක්ෂා කරන්න (webhook URL එක මෙතනට දාන්න)
             const webhookUrl = 'https://manjanaaloka.app.n8n.cloud/webhook/315088d0-b6a8-47a9-b41e-e02d6db474fe';
+
+            // UI Update
+            btn.disabled = true;
+            btn.innerText = "Processing... Please wait ⏳";
+            status.innerText = "";
 
             try {
                 const response = await fetch(webhookUrl, {
                     method: 'POST',
+                    mode: 'no-cors', // CORS ප්‍රශ්නයක් එනවා නම් විතරක් මේක තියන්න
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         title,
                         description,
-                        link: ""
+                        link
                     })
                 });
 
-                if (response.ok) {
-                    alert('වැඩේ ගොඩ! n8n එකට ලැබුණා.');
-                } else {
-                    alert('අවුලක් ගියා: ' + response.statusText);
-                }
+                // Note: mode: 'no-cors' දැම්මොත් response.ok වැඩ කරන්නේ නැහැ. 
+                // හැබැයි n8n එකට දත්ත යනවා. 
+                status.innerHTML = "<span class='success'>✅ සාර්ථකයි! පෝස්ට් එක ඉක්මනින් වැටෙයි.</span>";
+                document.getElementById('title').value = "";
+                document.getElementById('description').value = "";
+                document.getElementById('link').value = "";
+
             } catch (error) {
-                alert('Connection Error!');
+                status.innerHTML = "<span class='error'>❌ අවුලක් ගියා. ආයෙත් ට්‍රයි කරන්න.</span>";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Generate & Post Now";
             }
         }
     </script>
+
 </body>
 
 </html>
