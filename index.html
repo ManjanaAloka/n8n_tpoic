@@ -141,16 +141,16 @@
             status.innerText = "";
 
             try {
+                // headers කෑල්ල මෙහෙම දාන්න
                 const response = await fetch(webhookUrl, {
                     method: 'POST',
-                    mode: 'no-cors', // CORS ප්‍රශ්නයක් එනවා නම් විතරක් මේක තියන්න
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        title,
-                        description,
-                        link
+                        title: document.getElementById('title').value,
+                        description: document.getElementById('description').value,
+                        link: document.getElementById('link').value
                     })
                 });
 
