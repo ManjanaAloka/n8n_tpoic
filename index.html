@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Post Generator - Admin</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+        }
+        
+        input,
+        textarea {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>🚀 Create Manual Post</h2>
+    <input type="text" id="title" placeholder="News Title (Topic)">
+    <textarea id="description" rows="4" placeholder="Summary / Content"></textarea>
+    <input type="text" id="link" placeholder="Source Link (Optional)">
+    <button onclick="sendData()">Generate Post</button>
+
+    <script>
+        async function sendData() {
+            const data = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                link: document.getElementById('link').value
+            };
+
+            // ඔයාගේ n8n Webhook URL එක මෙතනට දාන්න
+            const webhookUrl = 'ඔයාගේ_WEBHOOK_URL_එක_මෙතනට';
+
+            const response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) alert('Successfully Triggered!');
+            else alert('Error: ' + response.statusText);
+        }
+    </script>
+</body>
+
+</html>
