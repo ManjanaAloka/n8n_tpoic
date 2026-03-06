@@ -1,62 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Post Generator - Admin</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Generator Admin</title>
     <style>
         body {
-            font-family: sans-serif;
-            padding: 20px;
-            max-width: 500px;
-            margin: auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        h2 {
+            color: #333;
+            text-align: center;
         }
         
         input,
         textarea {
             width: 100%;
-            margin-bottom: 10px;
-            padding: 10px;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
         }
         
         button {
-            background: #007bff;
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
             color: white;
             border: none;
-            padding: 10px;
+            border-radius: 5px;
             cursor: pointer;
-            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 
 <body>
-    <h2>🚀 Create Manual Post</h2>
-    <input type="text" id="title" placeholder="News Title (Topic)">
-    <textarea id="description" rows="4" placeholder="Summary / Content"></textarea>
-    <input type="text" id="link" placeholder="Source Link (Optional)">
-    <button onclick="sendData()">Generate Post</button>
+    <div class="card">
+        <h2>🚀 Create Tech Post</h2>
+        <input type="text" id="title" placeholder="Enter Topic (e.g. Docker Basics)" required>
+        <textarea id="description" rows="3" placeholder="Summary (Optional)"></textarea>
+        <button onclick="sendToN8N()">Generate Post</button>
+    </div>
 
     <script>
-        async function sendData() {
-            const data = {
-                title: document.getElementById('title').value,
-                description: document.getElementById('description').value,
-                link: document.getElementById('link').value
-            };
+        async function sendToN8N() {
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
 
-            // ඔයාගේ n8n Webhook URL එක මෙතනට දාන්න
-            const webhookUrl = 'ඔයාගේ_WEBHOOK_URL_එක_මෙතනට';
+            if (!title) {
+                alert("Topic එකක් දාන්න මචං!");
+                return;
+            }
 
-            const response = await fetch(webhookUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
+            const webhookUrl = 'https://manjanaaloka.app.n8n.cloud/webhook-test/315088d0-b6a8-47a9-b41e-e02d6db474fe';
 
-            if (response.ok) alert('Successfully Triggered!');
-            else alert('Error: ' + response.statusText);
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        link: ""
+                    })
+                });
+
+                if (response.ok) {
+                    alert('වැඩේ ගොඩ! n8n එකට ලැබුණා.');
+                } else {
+                    alert('අවුලක් ගියා: ' + response.statusText);
+                }
+            } catch (error) {
+                alert('Connection Error!');
+            }
         }
     </script>
 </body>
